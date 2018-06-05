@@ -58,3 +58,22 @@ slack.on('/quote', (msg, bot) => {
   };
   bot.reply(message);
 });
+
+// Message and help event handler
+slack.on('message', (msg, bot) => {
+
+  const message = msg.event.text.toLowerCase();
+
+  if (message.includes('hello')) {
+    bot.reply({
+        text: 'Welcome to the team!'
+    });
+  }
+
+  if (message.includes('help')) {
+    bot.reply({
+        text: 'If you need help, feel free to message the @channel.'
+    });
+  }
+
+});
