@@ -2,6 +2,7 @@
 
 // Include the serverless-slack bot framework
 const slack = require('serverless-slack');
+const randomQuotes = require('random-quotes');
 
 
 // The function that AWS Lambda will call
@@ -46,4 +47,14 @@ slack.on('reaction_added', (msg, bot) => {
   bot.reply({ 
     text: ':wave:' 
   });
+});
+
+
+// Slash random quote event handler
+slack.on('/quote', (msg, bot) => {
+  const quote = randomQuotes.default();
+  let message = {
+    text: '_' + quote.body + '_' + ' - ' + quote.author
+  };
+  bot.reply(message);
 });
