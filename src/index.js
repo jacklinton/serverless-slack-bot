@@ -3,6 +3,7 @@
 // Include the serverless-slack bot framework
 const slack = require('serverless-slack');
 const randomQuotes = require('random-quotes');
+const axios = require('axios');
 
 
 // The function that AWS Lambda will call
@@ -76,4 +77,50 @@ slack.on('message', (msg, bot) => {
     });
   }
 
+});
+
+// Listener for slash command that allows you to send a note to yourself.
+slack.on('/note', (msg, bot) => {
+  let prompt = {
+    text: msg.text + '\nDo you want to save this note?',
+    attachments: [{
+      fallback: 'actions',
+      callback_id: 'note_click',
+      actions: [
+          { type: 'button', name: 'Yes', text: 'Yes', value: msg.text},
+          { type: 'button', name: 'No', text: 'No'},
+      ]
+    }]
+  };
+  bot.replyPrivate(prompt);
+});
+
+// Callback for the /note command.
+slack.on('note_click', (msg, bot) => {
+
+  const text = msg.actions[0].value;
+
+  if (!text) {
+    return bot.replyPrivate({
+        text: 'Not saving this note.'
+    });
+  }
+
+  const url = 'https://hooks.slack.com/services/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';
+
+  const message = {
+    text: text
+  };
+
+  const success = {
+    text: 'Note added to your personal space.'
+  };
+
+  const failure = {
+    text: 'Could not add note :cry:'
+  };
+
+  axios.post(url, message)
+      .then(() => bot.replyPrivate(success))
+      .catch(() => bot.replyPrivate(failure))
 });
